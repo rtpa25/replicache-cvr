@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "ioredis": "^5.4.1",
+    "jose": "^5.2.4",
     "winston": "^3.13.0",
     "zod": "^3.22.4"
   }

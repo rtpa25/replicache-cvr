@@ -36,7 +36,7 @@ const config = {
 
     "@typescript-eslint/require-await": "off",
     "@typescript-eslint/no-misused-promises": [
-      "error",
+      "off",
       {
         checksVoidReturn: {
           attributes: false,

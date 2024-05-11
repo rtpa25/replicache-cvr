@@ -1,9 +1,12 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
 
 import { logger } from "@repo/lib";
 
 import { env } from "./env";
+import { createRouter } from "./routers";
 
 async function main() {
   const app = express();
@@ -16,13 +19,17 @@ async function main() {
     }),
   );
 
-  app.get("/health", (_req, res) => {
-    res.send("healthy");
-  });
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    }),
+  );
+  app.use(cookieParser());
 
   const PORT = env.API_SERVER_PORT ? parseInt(env.API_SERVER_PORT) : 8000;
 
   app.listen(PORT, () => {
+    createRouter(app);
     logger.info(`Server listening on port http://localhost:${PORT}`);
   });
 }
