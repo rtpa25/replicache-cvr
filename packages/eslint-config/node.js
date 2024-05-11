@@ -1,3 +1,7 @@
+const { resolve } = require("node:path");
+
+const project = resolve(process.cwd(), "tsconfig.json");
+
 /** @type {import("eslint").Linter.Config} */
 const config = {
   extends: ["./base.js"],
@@ -11,23 +15,11 @@ const config = {
         groups: [
           // ext library & side effect imports
           ["^@?\\w", "^\\u0000"],
-          ["^.+\\.s?css$"],
           ["^@repo/models"],
           // repo models
           ["^@repo/"],
           // repo packages
-          ["^~/lib"],
-          // Lib
-          ["^~/utils"],
-          // utils
-          ["^~/components"],
-          // Components
-          ["^~/hooks"],
-          // hooks
-          ["^~/ui"],
-          // UIs
-          ["^~/"],
-          // Other imports
+
           [
             "^\\./?$",
             "^\\.(?!/?$)",
@@ -46,5 +38,17 @@ const config = {
     ],
     //#endregion  //*======== Sort Import ===========
   },
+  env: {
+    node: true,
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {
+        project,
+      },
+    },
+  },
+  ignorePatterns: ["node_modules/", "dist/"],
 };
+
 module.exports = config;

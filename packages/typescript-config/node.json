@@ -1,8 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "React Library",
+  "display": "Node JS",
   "extends": "./base.json",
   "compilerOptions": {
-    "jsx": "react-jsx"
+    "moduleResolution": "Node",
+    "module": "CommonJS"
   }
 }

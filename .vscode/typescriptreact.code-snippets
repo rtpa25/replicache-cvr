@@ -1,0 +1,95 @@
+{
+  //#region  //*=========== React ===========
+  "import React": {
+    "prefix": "ir",
+    "body": ["import * as React from 'react';"],
+  },
+  "React.useState": {
+    "prefix": "us",
+    "body": [
+      "const [${1}, set${1/(^[a-zA-Z])(.*)/${1:/upcase}${2}/}] = React.useState<$3>(${2:initial${1/(^[a-zA-Z])(.*)/${1:/upcase}${2}/}})$0",
+    ],
+  },
+  "React.useEffect": {
+    "prefix": "uf",
+    "body": ["React.useEffect(() => {", "  $0", "}, []);"],
+  },
+  "React.useRef": {
+    "prefix": "urf",
+    "body": ["const ${1:someRef} = React.useRef($0)"],
+  },
+  "React Functional Component": {
+    "prefix": "rc",
+    "body": [
+      "import * as React from 'react';\n",
+      "const ${1:${TM_FILENAME_BASE}} = () => {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  )",
+      "}\n",
+      "export default ${1:${TM_FILENAME_BASE}};",
+    ],
+  },
+  "React Functional Component with Props": {
+    "prefix": "rcp",
+    "body": [
+      "import * as React from 'react';\n",
+      "import { cn } from '~/utils/cn';\n",
+      "interface ${1:${TM_FILENAME_BASE}}Props extends React.ComponentPropsWithoutRef<'div'> {",
+      "}",
+      "const ${1:${TM_FILENAME_BASE}} = ({className, ...rest}: ${1:${TM_FILENAME_BASE}}Props) => {",
+      "  return (",
+      "    <div className={cn(['', className])} {...rest}>",
+      "      $0",
+      "    </div>",
+      "  )",
+      "}\n",
+      "export default ${1:${TM_FILENAME_BASE}};",
+    ],
+  },
+  //#endregion  //*======== React ===========
+
+  //#region  //*=========== Commons ===========
+  "Region": {
+    "prefix": "reg",
+    "scope": "javascript, typescript, javascriptreact, typescriptreact",
+    "body": [
+      "//#region  //*=========== ${1} ===========",
+      "${TM_SELECTED_TEXT}$0",
+      "//#endregion  //*======== ${1} ===========",
+    ],
+  },
+  //#endregion  //*======== Commons ===========
+
+  //#region  //*=========== Next.js ===========
+  "Import useRouter": {
+    "prefix": "imust",
+    "body": ["import { useRouter } from 'next/router';"],
+  },
+  "Import Next Image": {
+    "prefix": "imimg",
+    "body": ["import Image from 'next/image';"],
+  },
+  "Import Next Link": {
+    "prefix": "iml",
+    "body": ["import Link from 'next/link';"],
+  },
+  //#endregion  //*======== Next.js ===========
+
+  //#region  //*=========== Snippet Wrap ===========
+  "Wrap with Fragment": {
+    "prefix": "ff",
+    "body": ["<>", "\t${TM_SELECTED_TEXT}", "</>"],
+  },
+  "Wrap with clsx": {
+    "prefix": "cx",
+    "body": ["{clsx([${TM_SELECTED_TEXT}$0])}"],
+  },
+  "Wrap with cn": {
+    "prefix": "cn",
+    "body": ["{cn([${TM_SELECTED_TEXT}$0, className])}"],
+  },
+  //#endregion  //*======== Snippet Wrap ===========
+}

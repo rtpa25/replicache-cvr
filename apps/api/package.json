@@ -1,0 +1,32 @@
+{
+  "name": "api",
+  "private": false,
+  "description": "API server",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "clean": "rimraf .turbo node_modules dist",
+    "lint": "eslint src/*",
+    "typecheck": "tsc --noEmit"
+  },
+  "author": {
+    "name": "Ronit Panda",
+    "email": "pandaronit25@gmail.com",
+    "url": "https://rtpa.pro"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "tsx": "^4.9.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/eslint": "^8.56.5",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.24",
+    "eslint": "^8.57.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  }
+}

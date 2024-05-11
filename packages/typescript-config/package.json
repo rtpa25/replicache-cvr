@@ -1,7 +1,19 @@
 {
   "name": "@repo/typescript-config",
-  "version": "0.0.0",
-  "private": true,
+  "author": {
+    "name": "Ronit Panda",
+    "email": "pandaronit25@gmail.com",
+    "url": "https://rtpa.pro"
+  },
+  "description": "Shared tsconfigs for monorepo",
+  "scripts": {
+    "clean": "rimraf .turbo node_modules"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.5"
+  },
+  "private": false,
   "license": "MIT",
   "publishConfig": {
     "access": "public"

@@ -3,5 +3,41 @@
     {
       "mode": "auto"
     }
-  ]
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "editor.tabSize": 2,
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  // Ignore tailwind css `@tailwind` warning
+  "css.validate": false,
+  // Tailwind CSS Autocomplete Prop
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
+    "classNames"
+  ],
+  /** @see https://cva.style/docs/getting-started/installation#intellisense */
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "cva\\(([^)]*)\\)",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ],
+    [
+      "cx\\(([^)]*)\\)",
+      "(?:'|\"|`)([^']*)(?:'|\"|`)"
+    ]
+  ],
+  /** Custom editor labels for Next.js files */
+  "workbench.editor.customLabels.patterns": {
+    "**/web/src/app/**/page.tsx": "${dirname} - page",
+    "**/web/src/app/**/layout.tsx": "${dirname} - layout",
+    "**/web/src/components/**/index.tsx": "${dirname} - component"
+  },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
