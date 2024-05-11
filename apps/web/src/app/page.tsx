@@ -1,13 +1,38 @@
-import { Button, Checkbox } from "@nextui-org/react";
-import Image from "next/image";
+"use client";
+
+import { Button, useDisclosure } from "@nextui-org/react";
+
+import Todo from "~/app/components/todo";
+import TodoModal from "~/app/components/todoModal";
 
 export default function Page(): JSX.Element {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const addTodo = () => {
+    onOpen();
+  };
+
   return (
-    <main>
-      <h1>Welcome to web!</h1>
-      <Image src="/next.svg" alt="Next.js Logo" width={200} height={200} />
-      <Button>Click me</Button>
-      <Checkbox className="bg-black p-2 h-2 w-2"></Checkbox>
+    <main className="max-w-screen-lg mx-auto p-6 flex flex-col gap-y-12">
+      <div className="flex justify-between items-center">
+        <h1 className="font-bold text-4xl">Todos</h1>
+        <Button color="primary" variant="shadow" onClick={addTodo}>
+          Add Todo
+        </Button>
+      </div>
+
+      <ul className="flex flex-col gap-y-4">
+        <Todo />
+      </ul>
+
+      <TodoModal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        heading="Add Todo"
+        onPrimaryAction={() => {
+          console.info("Add Todo");
+        }}
+      />
     </main>
   );
 }
