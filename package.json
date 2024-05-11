@@ -3,9 +3,15 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "clean": "turbo clean",
     "dev": "dotenv -- turbo dev",
-    "lint": "dotenv -- turbo lint",
+    "db:generate": "turbo db:generate --filter=models",
+    "db:migrate:dev": "dotenv -- turbo db:migrate:dev --filter=models",
+    "db:migrate:deploy": "dotenv -- turbo db:migrate:deploy --filter=models",
+    "db:reset": "dotenv -- turbo db:reset --filter=models",
     "format": "prettier --write \"**/*.{cjs,mjs,js,jsx,cts,mts,ts,tsx,html,css,json,md}\"",
+    "lint": "dotenv -- turbo lint",
+    "nuke": "turbo clean && rimraf node_modules",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {

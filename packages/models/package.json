@@ -1,0 +1,33 @@
+{
+  "name": "@repo/models",
+  "private": false,
+  "description": "Models for monorepo, consists of shared types and interfaces. Is also responsible for handling the database connection, schemas and migrations with prisma",
+  "author": {
+    "name": "Ronit Panda",
+    "email": "pandaronit25@gmail.com",
+    "url": "https://rtpa.pro"
+  },
+  "scripts": {
+    "clean": "rimraf node_modules .turbo",
+    "dev": "prisma studio --browser none",
+    "db:generate": "prisma generate",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:reset": "node -e \"if (['production', 'staging'].indexOf(process.env.NODE_ENV) === -1) { require('child_process').execSync('prisma migrate reset --force', { stdio: 'inherit' }); } else { console.log('Skipping db:reset in production or staging environment'); }\"",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.12.7",
+    "eslint": "^8.57.0",
+    "prisma": "^5.13.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@prisma/client": "5.13.0",
+    "zod": "^3.23.8"
+  }
+}
