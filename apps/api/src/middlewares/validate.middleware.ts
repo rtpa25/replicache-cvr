@@ -14,9 +14,10 @@ const validate = (schema: AnyZodObject) => (req: Request, res: Response, next: N
 
     if (!safeParse.success) {
       const errorMessages = safeParse.error.issues.map((issue) => issue.message);
+      // not really a meaningful error message for client, but these errors should ideally be caught on the client side, for forcefull server calls this is fine
       throw new AppError({
         code: "BAD_REQUEST",
-        messages: errorMessages,
+        message: errorMessages.join(", "),
       });
     }
 
