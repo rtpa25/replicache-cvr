@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 
 import { logger } from "@repo/lib";
@@ -6,6 +7,14 @@ import { env } from "./env";
 
 async function main() {
   const app = express();
+  app.use(express.json());
+  app.use(
+    cors({
+      origin: ["http://localhost:3000"],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+      credentials: true,
+    }),
+  );
 
   app.get("/health", (_req, res) => {
     res.send("healthy");
