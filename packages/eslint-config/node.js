@@ -48,7 +48,7 @@ const config = {
       },
     },
   },
-  ignorePatterns: ["node_modules/", "dist/"],
+  ignorePatterns: ["node_modules/", "dist/", ".eslintrc.js"],
 };
 
 module.exports = config;

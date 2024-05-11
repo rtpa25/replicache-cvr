@@ -1,0 +1,28 @@
+{
+  "name": "@repo/lib",
+  "private": false,
+  "author": {
+    "name": "Ronit Panda",
+    "email": "pandaronit25@gmail.com",
+    "url": "https://rtpa.pro"
+  },
+  "description": "A library consisting of common utilities and helpers",
+  "scripts": {
+    "clean": "rimraf .turbo node_modules dist",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.12.7",
+    "eslint": "^8.57.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "ioredis": "^5.4.1",
+    "winston": "^3.13.0",
+    "zod": "^3.22.4"
+  }
+}

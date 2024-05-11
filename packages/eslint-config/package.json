@@ -16,7 +16,6 @@
     "clean": "rimraf node_modules .turbo"
   },
   "devDependencies": {
-    "@vercel/style-guide": "^5.2.0",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "eslint": "^8.57.0",

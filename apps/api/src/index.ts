@@ -1,5 +1,7 @@
 import express from "express";
 
+import { logger } from "@repo/lib";
+
 import { env } from "./env";
 
 async function main() {
@@ -12,11 +14,11 @@ async function main() {
   const PORT = env.API_SERVER_PORT ? parseInt(env.API_SERVER_PORT) : 8000;
 
   app.listen(PORT, () => {
-    console.log(`Server listening on port http://localhost:${PORT}`);
+    logger.info(`Server listening on port http://localhost:${PORT}`);
   });
 }
 
 main().catch((error) => {
-  console.error(error);
+  logger.error(error);
   process.exit(1);
 });
