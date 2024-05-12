@@ -31,6 +31,8 @@ export const authenticate: RequestHandler = async (
     req.user = {
       id: res.uid,
     };
+
+    next();
   } catch (error) {
     logger.error(error);
     next(error);

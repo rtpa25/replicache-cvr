@@ -1,16 +1,17 @@
 import { Router } from "express";
 
+import { userCreateInputSchema } from "@repo/models";
+
 import { userController } from "../controllers/user.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 import validate from "../middlewares/validate.middleware";
-import { userCreateSchema } from "../schemas/user.schema";
 
 export const userRouter = Router({ mergeParams: true });
 
 /**
  * @method POST @url /users @desc create a new user and authenticate
  */
-userRouter.post("/", validate(userCreateSchema), userController.createUser);
+userRouter.post("/", validate(userCreateInputSchema), userController.upsertUser);
 
 /**
  * @method GET @url /users @desc get's the current authenticated user

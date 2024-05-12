@@ -1,20 +1,24 @@
 import { type NextFunction, type Request, type RequestHandler, type Response } from "express";
 
+import {
+  type UserCreateInputType,
+  type UserCreateOutputType,
+  type UserGetOutputType,
+} from "@repo/models";
+
 import { generateEncryptedToken, logger } from "@repo/lib";
 
-import { type UserCreateType } from "../schemas/user.schema";
 import { cookieService } from "../services/cookie.service";
 import { userService } from "../services/user.service";
 
 class UserController {
-  createUser: RequestHandler = async (
-    req: Request<object, object, UserCreateType["body"]>,
-    res: Response,
+  upsertUser: RequestHandler = async (
+    req: Request<object, object, UserCreateInputType["body"]>,
+    res: Response<UserCreateOutputType>,
     next: NextFunction,
   ) => {
     try {
-      const user = await userService.createUser(req.body.email);
-      logger.info(`User created: ${user.id}`);
+      const user = await userService.upsertUser(req.body.email);
 
       const { token } = await generateEncryptedToken({
         uid: user.id,
@@ -22,7 +26,7 @@ class UserController {
 
       cookieService.setTokenCookie({ res, token });
 
-      res.status(201).send(user);
+      res.status(201).json({ user });
     } catch (error) {
       logger.error(error);
       next(error);
@@ -34,18 +38,22 @@ class UserController {
       const user = req.user;
       await userService.deleteUser(user.id);
       cookieService.clearTokenCookie({ res });
-      res.status(204).send();
+      res.status(204);
     } catch (error) {
       logger.error(error);
       next(error);
     }
   };
 
-  getCurrentUser: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+  getCurrentUser: RequestHandler = async (
+    req: Request,
+    res: Response<UserGetOutputType>,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
-      res.status(200).send({
-        userId: user.id,
+      res.status(200).json({
+        user,
       });
     } catch (error) {
       logger.error(error);

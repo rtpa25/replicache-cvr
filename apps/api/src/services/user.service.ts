@@ -1,11 +1,15 @@
 import { prismaClient } from "@repo/models";
 
 class UserService {
-  async createUser(email: string) {
-    return prismaClient.user.create({
-      data: {
+  async upsertUser(email: string) {
+    return prismaClient.user.upsert({
+      where: {
         email,
       },
+      create: {
+        email,
+      },
+      update: {},
       select: {
         id: true,
       },

@@ -3,7 +3,9 @@ import { type AnyZodObject } from "zod";
 
 import { AppError } from "@repo/models";
 
-const validate = (schema: AnyZodObject) => (req: Request, res: Response, next: NextFunction) => {
+import { logger } from "@repo/lib";
+
+const validate = (schema: AnyZodObject) => (req: Request, _res: Response, next: NextFunction) => {
   try {
     const safeParse = schema.safeParse({
       query: req.query,
@@ -13,7 +15,10 @@ const validate = (schema: AnyZodObject) => (req: Request, res: Response, next: N
     });
 
     if (!safeParse.success) {
-      const errorMessages = safeParse.error.issues.map((issue) => issue.message);
+      const errorMessages = safeParse.error.issues.map(
+        (issue) => `${issue.path.join(".")} ${issue.message}`,
+      );
+      logger.error(errorMessages.join(", "));
       // not really a meaningful error message for client, but these errors should ideally be caught on the client side, for forcefull server calls this is fine
       throw new AppError({
         code: "BAD_REQUEST",
@@ -23,7 +28,7 @@ const validate = (schema: AnyZodObject) => (req: Request, res: Response, next: N
 
     next();
   } catch (e: unknown) {
-    return res.status(400).send(e);
+    next(e);
   }
 };
 

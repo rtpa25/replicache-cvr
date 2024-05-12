@@ -17,8 +17,12 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@repo/models": "workspace:*",
     "@nextui-org/react": "^2.3.6",
+    "@t3-oss/env-nextjs": "^0.9.2",
+    "@tanstack/react-query": "^5.35.5",
     "autoprefixer": "^10.4.19",
+    "axios": "^1.6.8",
     "framer-motion": "^11.1.9",
     "next": "^14.1.1",
     "postcss": "^8.4.38",
