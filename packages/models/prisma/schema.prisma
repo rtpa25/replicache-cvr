@@ -8,8 +8,43 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(uuid())
-  email String @unique
+  id           String        @id @default(uuid())
+  email        String        @unique
+  clientGroups ClientGroup[]
+  todos        Todo[]
 
   @@map("users")
+}
+
+model ClientGroup {
+  id                 String   @id
+  userId             String   @map("user_id")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientGroupVersion Int      @default(0) @map("client_group_version")
+  cvrVersion         Int?     @map("cvr_version")
+  clients            Client[]
+  lastModified       DateTime @default(now()) @map("last_modified")
+
+  @@map("client_groups")
+}
+
+model Client {
+  id                        String      @id
+  lastMutationId            Int         @default(0) @map("last_mutation_id")
+  lastModifiedClientVersion Int         @default(0) @map("last_modified_client_version")
+  clientGroupId             String      @map("client_group_id")
+  clientGroup               ClientGroup @relation(fields: [clientGroupId], references: [id], onDelete: Cascade)
+
+  @@map("clients")
+}
+
+model Todo {
+  id         String  @id
+  title      String
+  completed  Boolean @default(false)
+  userId     String  @map("user_id")
+  user       User    @relation(fields: [userId], references: [id])
+  rowVersion Int     @default(0)
+
+  @@map("todos")
 }
