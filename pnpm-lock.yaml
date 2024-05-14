@@ -251,6 +251,9 @@ importers:
       '@prisma/client':
         specifier: 5.13.0
         version: 5.13.0(prisma@5.13.0)
+      '@repo/lib':
+        specifier: workspace:*
+        version: link:../lib
       replicache:
         specifier: ^14.2.2
         version: 14.2.2

@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { pushRequestSchema } from "@repo/models";
+import { pullRequestSchema, pushRequestSchema } from "@repo/models";
 
 import { replicacheController } from "../controllers/replicache.controller";
 import { authenticate } from "../middlewares/auth.middleware";
@@ -21,4 +21,4 @@ replicacheRouter.post(
 /**
  * @method POST @url /replicache/pull @desc pull diff from the server
  */
-replicacheRouter.get("/pull", authenticate, replicacheController.pull);
+replicacheRouter.get("/pull", validate(pullRequestSchema), authenticate, replicacheController.pull);

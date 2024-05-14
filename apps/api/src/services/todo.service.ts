@@ -84,6 +84,29 @@ export class TodoService {
       },
     });
   }
+
+  async findMeta({ userId }: { userId: string }) {
+    return this.tx.todo.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        id: true,
+        rowVersion: true,
+        userId: true,
+      },
+    });
+  }
+
+  async findMany({ ids }: { ids: string[] }) {
+    return this.tx.todo.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+  }
 }
 
 /**

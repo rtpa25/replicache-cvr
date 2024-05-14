@@ -16,3 +16,23 @@ export const pushRequestSchema = z.object({
   }),
 });
 export type PushRequestType = z.infer<typeof pushRequestSchema>;
+
+const cookieSchema = z
+  .object({
+    order: z.number(),
+    clientGroupID: z.string(),
+  })
+  .optional()
+  .nullable();
+
+export type PullCookie = z.infer<typeof cookieSchema>;
+
+export const pullRequestSchema = z.object({
+  body: z.object({
+    profileID: z.string(),
+    clientGroupID: z.string(),
+    cookie: cookieSchema,
+    schemaVersion: z.string(),
+  }),
+});
+export type PullRequestType = z.infer<typeof pullRequestSchema>;

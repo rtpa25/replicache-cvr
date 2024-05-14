@@ -4,6 +4,7 @@ import { AppError } from "@repo/models";
 
 import { logger } from "@repo/lib";
 
+import { replicacheRouter } from "./replicache.router";
 import { userRouter } from "./user.router";
 
 export const createRouter = (app: Express) => {
@@ -12,6 +13,7 @@ export const createRouter = (app: Express) => {
   });
 
   app.use("/users", userRouter);
+  app.use("/replicache", replicacheRouter);
 
   app.use((err: Error, _: Request, res: Response, _next: NextFunction) => {
     if (err instanceof AppError) {

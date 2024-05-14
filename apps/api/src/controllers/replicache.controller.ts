@@ -1,18 +1,30 @@
 import { type NextFunction, type Request, type RequestHandler, type Response } from "express";
 
-import { AppError, Prisma, prismaClient, type PushRequestType } from "@repo/models";
+import {
+  AppError,
+  CVR,
+  cvrCache,
+  Prisma,
+  prismaClient,
+  type PullCookie,
+  type PullRequestType,
+  type PullResponseOKV1,
+  type PushRequestType,
+} from "@repo/models";
 
 import { logger } from "@repo/lib";
 
 import { serverMutators } from "../mutators";
 import { ClientService } from "../services/client.service";
 import { ClientGroupService } from "../services/client-group.service";
+import { ReplicacheService } from "../services/replicache.service";
+import { TodoService } from "../services/todo.service";
 
 class ReplicacheController {
   push: RequestHandler = async (
     req: Request<object, object, PushRequestType["body"]>,
     res: Response,
-    _next: NextFunction,
+    next: NextFunction,
   ) => {
     try {
       const userId = req.user.id;
@@ -107,12 +119,121 @@ class ReplicacheController {
       res.status(200).json({
         success: true,
       });
-    } catch (error) {}
+    } catch (error) {
+      if (error instanceof AppError) {
+        return next(error);
+      }
+      logger.error(error);
+      return next(
+        new AppError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            "Failed to pull data from the server, due to an internal error. Please try again later.",
+        }),
+      );
+    }
   };
 
-  pull: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+  pull: RequestHandler = async (
+    req: Request<object, object, PullRequestType["body"]>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-    } catch (error) {}
+      const userId = req.user.id;
+      const { cookie, clientGroupID } = req.body;
+      const { baseCVR, previousCVR } = await cvrCache.getBaseCVR(clientGroupID, cookie);
+
+      const trxResponse = await prismaClient.$transaction(
+        async (tx) => {
+          const clientGroupService = new ClientGroupService(tx);
+          const clientService = new ClientService(tx);
+          const todoService = new TodoService(tx);
+
+          const baseClientGroup = await clientGroupService.createIfNotExists({
+            id: clientGroupID,
+            userId,
+          });
+          const clientChanges = await clientService.findManyByClientGroupId({
+            clientGroupId: clientGroupID,
+            sinceClientVersion: baseCVR.clientVersion,
+          });
+
+          const todosMeta = await todoService.findMeta({ userId });
+
+          const nextCVR = CVR.generateCVR({
+            clientVersion: baseClientGroup.clientGroupVersion,
+            todosMeta,
+          });
+
+          const todoPuts = CVR.getPutsSince(nextCVR.todos, baseCVR.todos);
+
+          let previousCVRVersion = baseClientGroup.cvrVersion;
+          if (previousCVRVersion === null) {
+            if (cookie) previousCVRVersion = cookie.order;
+            else previousCVRVersion = 0;
+          }
+          const nextClientGroup = await clientGroupService.update({
+            id: baseClientGroup.id,
+            cvrVersion: previousCVRVersion + 1,
+          });
+
+          const todos = await todoService.findMany({ ids: todoPuts });
+
+          const todoDels = CVR.getDelsSince(nextCVR.todos, baseCVR.todos);
+
+          const responseCookie: PullCookie = {
+            clientGroupID,
+            order: nextClientGroup.cvrVersion!, // taken from update request, so we can be sure that it's there
+          };
+
+          const patch = ReplicacheService.genPatch({
+            previousCVR,
+            TODO: {
+              data: todos,
+              dels: todoDels,
+            },
+          });
+
+          return {
+            nextCVR,
+            responseCookie,
+            patch,
+            clientChanges,
+          };
+        },
+        {
+          isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+          maxWait: 5000, // default 2000ms
+          timeout: 6000, // default 5000ms
+        },
+      );
+
+      const { patch, clientChanges, nextCVR, responseCookie } = trxResponse;
+      await cvrCache.setCVR(responseCookie.clientGroupID, responseCookie.order, nextCVR);
+
+      const body: PullResponseOKV1 = {
+        cookie: responseCookie,
+        lastMutationIDChanges: Object.fromEntries(
+          clientChanges.map((c) => [c.id, c.lastMutationId]),
+        ),
+        patch,
+      };
+
+      return res.status(200).json(body);
+    } catch (error) {
+      if (error instanceof AppError) {
+        return next(error);
+      }
+      logger.error(error);
+      return next(
+        new AppError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            "Failed to pull data from the server, due to an internal error. Please try again later.",
+        }),
+      );
+    }
   };
 }
 
