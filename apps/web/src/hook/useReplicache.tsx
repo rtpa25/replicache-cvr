@@ -5,10 +5,11 @@ import { Replicache } from "replicache";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
-import { type MutatorType } from "@repo/models";
+import { type M, type MutatorType } from "@repo/models";
 
 import { env } from "~/env";
 import { useUser } from "~/hook/user-user";
+import { clientMutators } from "~/mutators";
 
 type State = {
   rep: Replicache<M<MutatorType.CLIENT>> | null;

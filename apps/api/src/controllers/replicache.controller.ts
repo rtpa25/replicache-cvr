@@ -19,6 +19,7 @@ import { ClientService } from "../services/client.service";
 import { ClientGroupService } from "../services/client-group.service";
 import { ReplicacheService } from "../services/replicache.service";
 import { TodoService } from "../services/todo.service";
+import { sendPoke } from "../utils/poke";
 
 class ReplicacheController {
   push: RequestHandler = async (
@@ -26,10 +27,9 @@ class ReplicacheController {
     res: Response,
     next: NextFunction,
   ) => {
+    const userId = req.user.id;
+    const push = req.body;
     try {
-      const userId = req.user.id;
-      const push = req.body;
-
       const trxResponse = await prismaClient.$transaction(
         async (tx) => {
           //#region  //*=========== Init transactional services ===========
@@ -131,6 +131,8 @@ class ReplicacheController {
             "Failed to pull data from the server, due to an internal error. Please try again later.",
         }),
       );
+    } finally {
+      await sendPoke({ userId });
     }
   };
 

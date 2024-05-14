@@ -17,6 +17,7 @@ export const env = createEnv({
     NEXT_PUBLIC_API_URL: z.string(),
     NEXT_PUBLIC_REPLICACHE_LICENSE_KEY: z.string(),
     NEXT_PUBLIC_SCHEMA_VERSION: z.string().optional(),
+    NEXT_PUBLIC_VERCEL_URL: z.string().optional(),
   },
 
   shared: {
@@ -32,6 +33,7 @@ export const env = createEnv({
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_REPLICACHE_LICENSE_KEY: process.env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY,
     NEXT_PUBLIC_SCHEMA_VERSION: process.env.NEXT_PUBLIC_SCHEMA_VERSION,
+    NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

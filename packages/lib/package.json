@@ -21,6 +21,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "ably": "^2.0.4",
     "ioredis": "^5.4.1",
     "jose": "^5.2.4",
     "winston": "^3.13.0",
