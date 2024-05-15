@@ -1,3 +1,4 @@
+import { type TokenRequest } from "ably";
 import axios from "axios";
 
 import { type UserCreateOutputType, type UserGetOutputType } from "@repo/models";
@@ -33,6 +34,15 @@ export class API {
   deleteUser = async () => {
     try {
       const response = await _axios.delete("/users");
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getSocketAuthToken = async () => {
+    try {
+      const response = await _axios.get<TokenRequest>("/socket/token");
       return response.data;
     } catch (error) {
       throw error;
