@@ -21,12 +21,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
             callback(null, tokenRequest);
           } catch (error) {
-            if (typeof error === "string" || error instanceof ErrorInfo) callback(error, null);
+            if (typeof error === "string" || error instanceof ErrorInfo) {
+              callback(error, null);
+            }
             callback(error as never, null);
           }
         },
+        /**
+         * Auto-connect in the browser because we don't have cookies in the next-server
+         * and we don't want ably to fire authCallback without cookies
+         * @see https://github.com/ably/ably-js/issues/1742
+         */
+        autoConnect: typeof window !== "undefined",
         closeOnUnload: false,
-        tls: true,
       }),
   );
 

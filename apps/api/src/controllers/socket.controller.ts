@@ -4,7 +4,7 @@ import { nanoid } from "nanoid";
 import { ably } from "@repo/lib";
 
 class SocketController {
-  public getToken: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+  public getToken: RequestHandler = async (_req: Request, res: Response, next: NextFunction) => {
     try {
       const tokenRes = await ably.auth.createTokenRequest({
         clientId: nanoid(),
