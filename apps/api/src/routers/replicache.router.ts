@@ -21,4 +21,9 @@ replicacheRouter.post(
 /**
  * @method POST @url /replicache/pull @desc pull diff from the server
  */
-replicacheRouter.get("/pull", validate(pullRequestSchema), authenticate, replicacheController.pull);
+replicacheRouter.post(
+  "/pull",
+  validate(pullRequestSchema),
+  authenticate,
+  replicacheController.pull,
+);

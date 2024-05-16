@@ -1,11 +1,13 @@
 import { useAbly } from "ably/react";
+import { AxiosError } from "axios";
 import { nanoid } from "nanoid";
 import * as React from "react";
-import { Replicache } from "replicache";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
-import { type M, type MutatorType } from "@repo/models";
+import { type M, type MutatorType, type PullResponseOKV1, Replicache } from "@repo/models";
+
+import { api } from "~/lib/api";
 
 import { env } from "~/env";
 import { useUser } from "~/hook/user-user";
@@ -38,7 +40,6 @@ export const useLoadReplicache = () => {
 
   React.useEffect(() => {
     if (!user?.id) return;
-
     const iid = nanoid();
 
     const r = new Replicache({
@@ -46,9 +47,60 @@ export const useLoadReplicache = () => {
       licenseKey: env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY,
       mutators: clientMutators(user.id),
       schemaVersion: env.NEXT_PUBLIC_SCHEMA_VERSION ?? "1",
-      pushURL: `${env.NEXT_PUBLIC_API_URL}/replicache/push?instance=${iid}`,
-      pullURL: `${env.NEXT_PUBLIC_API_URL}/replicache/pull?instance=${iid}`,
     });
+
+    r.pusher = async (opts) => {
+      try {
+        const response = await api.replicachePush(opts, iid);
+        return {
+          httpRequestInfo: {
+            httpStatusCode: response.status,
+            errorMessage: "",
+          },
+        };
+      } catch (error) {
+        if (error instanceof AxiosError)
+          return {
+            httpRequestInfo: {
+              httpStatusCode: error.status ?? 500,
+              errorMessage: error.message,
+            },
+          };
+        return {
+          httpRequestInfo: {
+            httpStatusCode: 500,
+            errorMessage: "Unknown error",
+          },
+        };
+      }
+    };
+
+    r.puller = async (opts) => {
+      try {
+        const response = await api.replicachePull(opts, iid);
+        return {
+          response: response.data as PullResponseOKV1,
+          httpRequestInfo: {
+            errorMessage: "",
+            httpStatusCode: response.status,
+          },
+        };
+      } catch (error) {
+        if (error instanceof AxiosError)
+          return {
+            httpRequestInfo: {
+              httpStatusCode: error.status ?? 500,
+              errorMessage: error.message,
+            },
+          };
+        return {
+          httpRequestInfo: {
+            httpStatusCode: 500,
+            errorMessage: "Unknown error",
+          },
+        };
+      }
+    };
 
     setRep(r);
 

@@ -3,7 +3,7 @@ import { type NextFunction, type Request, type RequestHandler, type Response } f
 import {
   AppError,
   CVR,
-  cvrCache,
+  CVRCache,
   Prisma,
   prismaClient,
   type PullCookie,
@@ -12,7 +12,7 @@ import {
   type PushRequestType,
 } from "@repo/models";
 
-import { logger } from "@repo/lib";
+import { logger, redis } from "@repo/lib";
 
 import { serverMutators } from "../mutators";
 import { ClientService } from "../services/client.service";
@@ -20,6 +20,8 @@ import { ClientGroupService } from "../services/client-group.service";
 import { ReplicacheService } from "../services/replicache.service";
 import { TodoService } from "../services/todo.service";
 import { sendPoke } from "../utils/poke";
+
+const cvrCache = new CVRCache(redis);
 
 class ReplicacheController {
   push: RequestHandler = async (

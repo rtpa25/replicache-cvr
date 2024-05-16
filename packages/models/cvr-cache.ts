@@ -1,4 +1,4 @@
-import { type Redis, redis, TIME_WINDOWS } from "@repo/lib";
+import { type Redis, TIME_WINDOWS } from "@repo/lib";
 
 import { type ClientViewMetadata, CVR } from "./cvr";
 import { type PullCookie } from "./schemas";
@@ -77,5 +77,3 @@ export class CVRCache {
     await this.redis.expire(CVRCache.makeCVRKey(clientGroupID, order), TIME_WINDOWS.ONE_HOUR * 12);
   }
 }
-
-export const cvrCache = new CVRCache(redis);
