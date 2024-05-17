@@ -102,6 +102,9 @@ importers:
       '@repo/models':
         specifier: workspace:*
         version: link:../../packages/models
+      '@segment/isodate':
+        specifier: ^1.0.3
+        version: 1.0.3
       '@t3-oss/env-nextjs':
         specifier: ^0.9.2
         version: 0.9.2(typescript@5.3.3)(zod@3.23.8)
@@ -169,6 +172,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.19
         version: 18.2.19
+      '@types/segment__isodate':
+        specifier: ^1.0.2
+        version: 1.0.2
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -1544,6 +1550,9 @@ packages:
   '@rushstack/eslint-patch@1.5.1':
     resolution: {integrity: sha512-6i/8UoL0P5y4leBIGzvkZdS85RDMG9y1ihZzmTZQ5LdHUYmZ7pKFoj8X0236s3lusPs1Fa5HTQUpwI+UfTcmeA==}
 
+  '@segment/isodate@1.0.3':
+    resolution: {integrity: sha512-BtanDuvJqnACFkeeYje7pWULVv8RgZaqKHWwGFnL/g/TH/CcZjkIVTfGDp/MAxmilYHUkrX70SqwnYSTNEaN7A==}
+
   '@sindresorhus/is@4.6.0':
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
     engines: {node: '>=10'}
@@ -1667,6 +1676,9 @@ packages:
 
   '@types/scheduler@0.16.3':
     resolution: {integrity: sha512-5cJ8CB4yAx7BH1oMvdU0Jh9lrEXyPkar6F9G/ERswkCuvP4KQZfZkSjcMbAICCpQTN4OuZn8tz0HiKv9TGZgrQ==}
+
+  '@types/segment__isodate@1.0.2':
+    resolution: {integrity: sha512-qZ+3V3rnZCERLKqwM8qUdwFnOoFfZPiKaUAVXqsGsPFJKkb2YvSKjuB5wcPT/rVEsTiz2PshUID6Mj/nKOWcGg==}
 
   '@types/semver@7.5.8':
     resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
@@ -5769,6 +5781,8 @@ snapshots:
 
   '@rushstack/eslint-patch@1.5.1': {}
 
+  '@segment/isodate@1.0.3': {}
+
   '@sindresorhus/is@4.6.0': {}
 
   '@swc/helpers@0.4.14':
@@ -5904,6 +5918,8 @@ snapshots:
       '@types/node': 20.12.11
 
   '@types/scheduler@0.16.3': {}
+
+  '@types/segment__isodate@1.0.2': {}
 
   '@types/semver@7.5.8': {}
 

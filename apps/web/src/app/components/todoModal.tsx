@@ -13,7 +13,8 @@ interface TodoModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   heading: "Add Todo" | "Edit Todo";
-  onPrimaryAction: () => void;
+  onPrimaryAction: (text: string) => void;
+  defaultText?: string;
 }
 
 export default function TodoModal({
@@ -21,9 +22,13 @@ export default function TodoModal({
   onOpenChange,
   heading,
   onPrimaryAction,
+  defaultText,
 }: TodoModalProps) {
+  const [text, setText] = React.useState(defaultText ?? "");
+
   const primaryActionHandler = () => {
-    onPrimaryAction();
+    onPrimaryAction(text);
+    setText("");
     onOpenChange(false);
   };
 
@@ -34,9 +39,14 @@ export default function TodoModal({
           <>
             <ModalHeader className="flex flex-col gap-1">{heading}</ModalHeader>
             <ModalBody>
-              <form className="flex flex-col items-end gap-y-4">
-                <Input variant={"bordered"} label="Todo" />
-              </form>
+              <Input
+                variant={"bordered"}
+                label="Todo"
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value);
+                }}
+              />
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onClose}>

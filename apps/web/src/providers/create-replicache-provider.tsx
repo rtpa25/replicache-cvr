@@ -1,6 +1,5 @@
-import { useLoadReplicache } from "~/hook/useReplicache";
+import { useLoadReplicache } from "~/hook/use-replicache";
 
-// Separated to avoid re-rendering the entire app
 export const ReplicacheProvider = ({ children }: { children: React.ReactNode }) => {
   useLoadReplicache();
 

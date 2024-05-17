@@ -52,9 +52,11 @@ export class TodoService {
         id,
       },
       data: {
-        title: text,
-        completed,
-        rowVersion: todo.rowVersion + 1,
+        title: text ?? todo.title,
+        completed: completed ?? todo.completed,
+        rowVersion: {
+          increment: 1,
+        },
       },
     });
   }

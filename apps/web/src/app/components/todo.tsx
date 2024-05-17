@@ -11,10 +11,18 @@ import {
 } from "@nextui-org/react";
 import * as React from "react";
 
-import TodoModal from "~/app/components/todoModal";
+import { type TodoType } from "@repo/models";
 
-export default function Todo() {
+import TodoModal from "~/app/components/todoModal";
+import { useReplicache } from "~/hook/use-replicache";
+
+interface TodoProps {
+  todo: TodoType;
+}
+
+export default function Todo({ todo }: TodoProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { rep } = useReplicache();
 
   return (
     <>
@@ -26,7 +34,7 @@ export default function Todo() {
                 <Button variant="light">::</Button>
               </DropdownTrigger>
               <DropdownMenu aria-label="Static Actions">
-                <DropdownItem key="new" onClick={() => onOpen()}>
+                <DropdownItem key="new" onClick={onOpen}>
                   Edit Todo
                 </DropdownItem>
                 <DropdownItem key="delete" className="text-danger" color="danger">
@@ -34,17 +42,31 @@ export default function Todo() {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
-            <p>Make beautiful websites regardless of your design experience.</p>
+            <p>{todo.title}</p>
           </div>
-          <Checkbox />
+          <Checkbox
+            isSelected={todo.completed}
+            onValueChange={() => {
+              if (!rep) return;
+              rep.mutate.todoUpdate({
+                id: todo.id,
+                completed: !todo.completed,
+              });
+            }}
+          />
         </CardBody>
       </Card>
       <TodoModal
         heading="Edit Todo"
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        onPrimaryAction={() => {
-          console.info("Edit Todo");
+        defaultText={todo.title}
+        onPrimaryAction={(text) => {
+          if (!rep) return;
+          rep.mutate.todoUpdate({
+            id: todo.id,
+            text,
+          });
         }}
       />
     </>

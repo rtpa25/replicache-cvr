@@ -11,8 +11,8 @@ export type TodoCreateType = z.infer<typeof todoCreateSchema>;
 
 export const todoUpdateSchema = z.object({
   id: z.string().nanoid(),
-  text: z.string().min(1).max(100),
-  completed: z.boolean(),
+  text: z.string().min(1).max(100).optional(),
+  completed: z.boolean().optional(),
 });
 export type TodoUpdateType = z.infer<typeof todoUpdateSchema>;
 

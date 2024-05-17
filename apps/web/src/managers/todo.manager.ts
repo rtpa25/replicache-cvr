@@ -6,8 +6,10 @@ import {
   type TodoUpdateType,
 } from "@repo/models";
 
+import { normalizeReplicacheData } from "~/lib/replicache";
+
 export class TodoManager {
-  static async createTodo(args: TodoCreateType & { userId: string }) {
+  static createTodo(args: TodoCreateType & { userId: string }) {
     const todo: TodoType = {
       id: args.id,
       title: args.text,
@@ -31,11 +33,23 @@ export class TodoManager {
     return todo;
   }
 
-  static async updateTodo({ oldTodo, args }: { oldTodo: TodoType; args: TodoUpdateType }) {
+  static updateTodo({ oldTodo, args }: { oldTodo: TodoType; args: TodoUpdateType }) {
     return {
       ...oldTodo,
       title: args.text,
       completed: args.completed,
     } as TodoType;
+  }
+
+  static async getallTodos({ tx, userId }: { tx: ReadTransaction; userId: string }) {
+    const _todos = await tx
+      .scan({
+        prefix: IDB_KEY.TODO({ userId }),
+      })
+      .entries()
+      .toArray();
+
+    const todos = normalizeReplicacheData<TodoType>(_todos);
+    return todos;
   }
 }
