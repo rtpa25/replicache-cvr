@@ -5,7 +5,7 @@ import { type PullCookie } from "./schemas";
 
 type RedisCVR = {
   todos: Record<string, ClientViewMetadata>[];
-  clientVersion: number;
+  clients: Record<string, ClientViewMetadata>[];
 };
 
 export class CVRCache {
@@ -40,17 +40,19 @@ export class CVRCache {
        * that's why we make it to return Partial.
        *
        * Say we add a new model, and the client has an old CVR,
-       * that new model will not be in the CVR and break the app, so we need to create a fallback
+       * that new model will not be in the CVR and break the app, so we need to create a
+       * fallback
        */
-      const redisCVR = (await this.redis.get(
-        CVRCache.makeCVRKey(clientGroupID, cookie.order),
-      )) as Partial<RedisCVR>;
+      const _redisCVR = await this.redis.get(CVRCache.makeCVRKey(clientGroupID, cookie.order));
+      const redisCVR = _redisCVR ? (JSON.parse(_redisCVR) as Partial<RedisCVR>) : undefined;
 
       if (redisCVR) {
         const cvr = new CVR({
           // fallback to empty map in case we have a new model
           todos: redisCVR.todos ? CVRCache.convertRedisObjectToMap(redisCVR.todos) : new Map(),
-          clientVersion: redisCVR.clientVersion ?? 0,
+          clients: redisCVR.clients
+            ? CVRCache.convertRedisObjectToMap(redisCVR.clients)
+            : new Map(),
         });
 
         previousCVR = cvr;
@@ -61,7 +63,7 @@ export class CVRCache {
       previousCVR ??
       new CVR({
         todos: new Map<string, ClientViewMetadata>(),
-        clientVersion: 0,
+        clients: new Map<string, ClientViewMetadata>(),
       });
 
     return { baseCVR, previousCVR };
@@ -70,7 +72,7 @@ export class CVRCache {
   public async setCVR(clientGroupID: string, order: number, cvr: CVR) {
     const redisCVR: RedisCVR = {
       todos: CVRCache.convertMapToRedisObject(cvr.todos),
-      clientVersion: cvr.clientVersion,
+      clients: CVRCache.convertMapToRedisObject(cvr.clients),
     };
 
     await this.redis.set(CVRCache.makeCVRKey(clientGroupID, order), JSON.stringify(redisCVR));

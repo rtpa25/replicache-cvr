@@ -1,9 +1,11 @@
 import {
+  AppError,
   type ClientCreateArgs,
   type ClientCreateIfNotExistsType,
-  type ClientFindManyByClientGroupIdType,
   type ClientUpdateArgs,
+  type Prisma,
   prismaClient,
+  type SearchResult,
   type TransactionalPrismaClient,
 } from "@repo/models";
 
@@ -20,7 +22,6 @@ export class ClientService {
       },
       data: {
         lastMutationId: args.lastMutationId,
-        lastModifiedClientVersion: args.lastModifiedClientVersion,
       },
     });
   }
@@ -55,18 +56,85 @@ export class ClientService {
     });
   }
 
-  async findManyByClientGroupId({
-    clientGroupId,
-    sinceClientVersion,
-  }: ClientFindManyByClientGroupIdType) {
-    return this.tx.client.findMany({
+  async getClientById({ id, clientGroupId }: { id: string; clientGroupId: string }): Promise<
+    Prisma.ClientGetPayload<{
+      select: {
+        id: true;
+        clientGroupId: true;
+        lastMutationId: true;
+      };
+    }>
+  > {
+    const client = await this.tx.client.findUnique({
       where: {
+        id,
         clientGroupId,
-        lastModifiedClientVersion: {
-          gt: sinceClientVersion,
-        },
+      },
+      select: {
+        id: true,
+        clientGroupId: true,
+        lastMutationId: true,
       },
     });
+    if (!client) {
+      return {
+        id,
+        clientGroupId,
+        lastMutationId: 0,
+      };
+    }
+    if (client.clientGroupId !== clientGroupId) {
+      throw new AppError({
+        code: "UNAUTHORIZED",
+        message: "You are not authorized to access this client",
+      });
+    }
+    return client;
+  }
+
+  async upsert({
+    id,
+    clientGroupId,
+    lastMutationId,
+  }: {
+    id: string;
+    clientGroupId: string;
+    lastMutationId: number;
+  }) {
+    await this.tx.client.upsert({
+      where: {
+        id,
+        clientGroupId,
+      },
+      create: {
+        id,
+        clientGroupId,
+        lastMutationId,
+      },
+      update: {
+        lastMutationId,
+      },
+      select: {
+        id: true,
+      },
+    });
+  }
+
+  async findMeta({ clientGroupId }: { clientGroupId: string }): Promise<SearchResult[]> {
+    const clients = await this.tx.client.findMany({
+      where: {
+        clientGroupId,
+      },
+      select: {
+        id: true,
+        lastMutationId: true,
+      },
+    });
+
+    return clients.map((client) => ({
+      id: client.id,
+      rowVersion: client.lastMutationId,
+    }));
   }
 }
 

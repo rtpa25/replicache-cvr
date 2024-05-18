@@ -17,23 +17,23 @@ model User {
 }
 
 model ClientGroup {
-  id                 String   @id
-  userId             String   @map("user_id")
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clientGroupVersion Int      @default(0) @map("client_group_version")
-  cvrVersion         Int?     @map("cvr_version")
-  clients            Client[]
-  lastModified       DateTime @default(now()) @map("last_modified")
+  id           String   @id
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String   @map("user_id")
+  cvrVersion   Int      @map("cvr_version")
+  rowVersion   Int      @default(0) @map("row_version")
+  lastModified DateTime @default(now()) @updatedAt @map("last_modified")
+  clients      Client[]
 
   @@map("client_groups")
 }
 
 model Client {
-  id                        String      @id
-  lastMutationId            Int         @default(0) @map("last_mutation_id")
-  lastModifiedClientVersion Int         @default(0) @map("last_modified_client_version")
-  clientGroupId             String      @map("client_group_id")
-  clientGroup               ClientGroup @relation(fields: [clientGroupId], references: [id], onDelete: Cascade)
+  id             String      @id
+  clientGroup    ClientGroup @relation(fields: [clientGroupId], references: [id], onDelete: Cascade)
+  clientGroupId  String      @map("client_group_id")
+  lastMutationId Int         @default(0) @map("last_mutation_id")
+  lastModified   DateTime    @default(now()) @updatedAt @map("last_modified")
 
   @@map("clients")
 }
@@ -44,7 +44,7 @@ model Todo {
   completed  Boolean @default(false)
   userId     String  @map("user_id")
   user       User    @relation(fields: [userId], references: [id])
-  rowVersion Int     @default(0)
+  rowVersion Int     @default(0) @map("row_version")
 
   @@map("todos")
 }

@@ -1,4 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
+
+import { logger } from "@repo/lib";
+
+import { AppError } from "./err";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -12,3 +16,31 @@ export type TransactionalPrismaClient = Parameters<Parameters<PrismaClient["$tra
 
 export default prismaClient;
 export * from "@prisma/client";
+
+export async function transact<T>(body: (tx: TransactionalPrismaClient) => Promise<T>): Promise<T> {
+  for (let i = 0; i < 10; i++) {
+    try {
+      const r = await prismaClient.$transaction(body, {
+        isolationLevel: "Serializable",
+      });
+      return r;
+    } catch (error) {
+      logger.error(`Transaction failed, retrying...${error}`);
+      if (shouldRetryTxn(error)) {
+        logger.debug(`Retrying transaction...`);
+        continue;
+      }
+    }
+  }
+  throw new AppError({
+    code: "INTERNAL_SERVER_ERROR",
+    message: "Tried 10 times, but transaction still failed",
+  });
+}
+
+function shouldRetryTxn(error: unknown) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    return error.code === "P2002";
+  }
+  return false;
+}

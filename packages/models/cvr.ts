@@ -1,15 +1,9 @@
 export type SearchResult = {
   id: string;
   rowVersion: number;
-  userId: string;
 };
 
-export type DeleteMetadata = {
-  id: string;
-  userId: string;
-};
-
-export type ClientViewMetadata = { rowVersion: number; userId: string };
+export type ClientViewMetadata = { rowVersion: number };
 type ClientViewMap = Map<string, ClientViewMetadata>;
 
 /**
@@ -17,17 +11,17 @@ type ClientViewMap = Map<string, ClientViewMetadata>;
  * In other words, it captures what data a Client Group had at a particular moment in time.
  */
 export class CVR {
-  public clientVersion: number;
+  public clients: ClientViewMap;
   public todos: ClientViewMap;
 
-  constructor({ clientVersion, todos }: { clientVersion: number; todos: ClientViewMap }) {
-    this.clientVersion = clientVersion;
+  constructor({ clients, todos }: { clients: ClientViewMap; todos: ClientViewMap }) {
+    this.clients = clients;
     this.todos = todos;
   }
 
   static serializeSearchResult(result: SearchResult[]): Map<string, ClientViewMetadata> {
     const data = new Map<string, ClientViewMetadata>();
-    result.forEach((row) => data.set(row.id, { rowVersion: row.rowVersion, userId: row.userId }));
+    result.forEach((row) => data.set(row.id, { rowVersion: row.rowVersion }));
 
     return data;
   }
@@ -43,26 +37,26 @@ export class CVR {
     return puts;
   }
 
-  static getDelsSince(nextData: ClientViewMap, prevData: ClientViewMap): DeleteMetadata[] {
-    const dels: DeleteMetadata[] = [];
-    prevData.forEach((val, id) => {
+  static getDelsSince(nextData: ClientViewMap, prevData: ClientViewMap): string[] {
+    const dels: string[] = [];
+    prevData.forEach((_, id) => {
       if (!nextData.has(id)) {
-        dels.push({ userId: val.userId, id });
+        dels.push(id);
       }
     });
     return dels;
   }
 
   static generateCVR({
-    clientVersion,
     todosMeta,
+    clientsMeta,
   }: {
-    clientVersion: number;
     todosMeta: SearchResult[];
+    clientsMeta: SearchResult[];
   }): CVR {
     return {
       todos: CVR.serializeSearchResult(todosMeta),
-      clientVersion,
+      clients: CVR.serializeSearchResult(clientsMeta),
     };
   }
 }

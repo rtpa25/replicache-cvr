@@ -10,14 +10,13 @@ export const IDB_KEY = {
    * Last param should be '', to make it `/todo/` rather than `/todo`
    *
    * @example
-   * await tx.scan(IDB_KEY.TODO({ userId: 'userId' })))
-   * 'userId/todo/' --> list of todos
+   * await tx.scan(IDB_KEY.TODO({})))
+   * 'todo/' --> list of todos
    *
-   * await tx.set(IDB_KEY.TODO({ userId: 'userId', id: '1' })))
-   * 'userId/todo/1' --> todo with id '1'
+   * await tx.set(IDB_KEY.TODO({id: '1'})))
+   * 'todo/1' --> todo with id '1'
    */
-  TODO: ({ userId, id = "" }: { userId: string; id?: string }) =>
-    constructIDBKey([userId, "project", id]),
+  TODO: ({ id = "" }: { id?: string }) => constructIDBKey(["todo", id]),
 };
 export type IDBKeys = keyof typeof IDB_KEY;
 

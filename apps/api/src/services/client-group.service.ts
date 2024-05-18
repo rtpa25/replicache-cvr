@@ -1,8 +1,4 @@
-import {
-  type ClientGroupCreateIfNotExistsType,
-  type ClientGroupUpdateArgs,
-  prismaClient,
-} from "@repo/models";
+import { AppError, type ClientGroupUpdateArgs, type Prisma, prismaClient } from "@repo/models";
 import { type TransactionalPrismaClient } from "@repo/models";
 
 /**
@@ -11,28 +7,76 @@ import { type TransactionalPrismaClient } from "@repo/models";
 export class ClientGroupService {
   constructor(private tx: TransactionalPrismaClient = prismaClient) {}
 
-  async createIfNotExists({ id, userId }: ClientGroupCreateIfNotExistsType) {
-    return this.tx.clientGroup.upsert({
-      where: {
-        id,
-        userId,
-      },
-      create: {
-        id,
-        userId,
-      },
-      update: {},
-    });
-  }
-
-  async update({ id, clientGroupVersion, cvrVersion }: ClientGroupUpdateArgs) {
+  async update({ id, rowVersion, cvrVersion }: ClientGroupUpdateArgs) {
     return this.tx.clientGroup.update({
       where: {
         id,
       },
       data: {
-        clientGroupVersion,
+        rowVersion,
         cvrVersion,
+      },
+    });
+  }
+
+  async getClientGroupById({ id, userId }: { id: string; userId: string }): Promise<
+    Prisma.ClientGroupGetPayload<{
+      select: {
+        id: true;
+        userId: true;
+        cvrVersion: true;
+        rowVersion: true;
+      };
+    }>
+  > {
+    const clientGroup = await this.tx.clientGroup.findUnique({
+      where: {
+        id,
+        userId,
+      },
+      select: {
+        id: true,
+        userId: true,
+        cvrVersion: true,
+        rowVersion: true,
+      },
+    });
+    if (!clientGroup) {
+      return {
+        id,
+        userId,
+        cvrVersion: 0,
+        rowVersion: 0,
+      };
+    }
+    if (clientGroup.userId !== userId) {
+      throw new AppError({
+        code: "UNAUTHORIZED",
+        message: "You are not authorized to access this client group",
+      });
+    }
+    return clientGroup;
+  }
+
+  async upsert({ id, userId, cvrVersion }: { id: string; userId: string; cvrVersion: number }) {
+    return await this.tx.clientGroup.upsert({
+      where: {
+        id,
+        userId,
+      },
+      update: {
+        lastModified: new Date(),
+        cvrVersion,
+      },
+      create: {
+        id,
+        userId,
+        cvrVersion,
+        lastModified: new Date(),
+      },
+      select: {
+        id: true,
+        cvrVersion: true,
       },
     });
   }

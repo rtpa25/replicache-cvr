@@ -2,6 +2,7 @@ import {
   AppError,
   type MutatorContext,
   prismaClient,
+  type SearchResult,
   type TodoCreateType,
   type TodoUpdateType,
 } from "@repo/models";
@@ -87,7 +88,7 @@ export class TodoService {
     });
   }
 
-  async findMeta({ userId }: { userId: string }) {
+  async findMeta({ userId }: { userId: string }): Promise<SearchResult[]> {
     return this.tx.todo.findMany({
       where: {
         userId,
@@ -95,7 +96,6 @@ export class TodoService {
       select: {
         id: true,
         rowVersion: true,
-        userId: true,
       },
     });
   }
