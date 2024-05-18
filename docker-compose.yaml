@@ -23,5 +23,4 @@ services:
 
 volumes:
   postgres_data:
-  nats_data:
   redis_data:

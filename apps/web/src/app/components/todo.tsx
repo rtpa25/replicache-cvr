@@ -37,7 +37,15 @@ export default function Todo({ todo }: TodoProps) {
                 <DropdownItem key="new" onClick={onOpen}>
                   Edit Todo
                 </DropdownItem>
-                <DropdownItem key="delete" className="text-danger" color="danger">
+                <DropdownItem
+                  key="delete"
+                  className="text-danger"
+                  color="danger"
+                  onClick={() => {
+                    if (!rep) return;
+                    rep.mutate.todoDelete({ id: todo.id });
+                  }}
+                >
                   Delete Todo
                 </DropdownItem>
               </DropdownMenu>
