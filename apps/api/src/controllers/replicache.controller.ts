@@ -150,6 +150,9 @@ class ReplicacheController {
 
       const { patch, clientChanges, nextCVR, responseCookie } = trxResponse;
       await cvrCache.setCVR(responseCookie.clientGroupID, responseCookie.order, nextCVR);
+      if (cookie) {
+        await cvrCache.delCVR(clientGroupID, cookie.order);
+      }
 
       const body: PullResponseOKV1 = {
         cookie: responseCookie,

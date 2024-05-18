@@ -78,4 +78,8 @@ export class CVRCache {
     await this.redis.set(CVRCache.makeCVRKey(clientGroupID, order), JSON.stringify(redisCVR));
     await this.redis.expire(CVRCache.makeCVRKey(clientGroupID, order), TIME_WINDOWS.ONE_HOUR * 12);
   }
+
+  public async delCVR(clientGroupID: string, order: number) {
+    await this.redis.del(CVRCache.makeCVRKey(clientGroupID, order));
+  }
 }
