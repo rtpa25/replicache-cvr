@@ -9,7 +9,11 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-export const prismaClient = global.prisma || new PrismaClient();
+export const prismaClient =
+  global.prisma ||
+  new PrismaClient({
+    log: ["query"],
+  });
 if (process.env.NODE_ENV !== "production") global.prisma = prismaClient;
 
 export type TransactionalPrismaClient = Parameters<Parameters<PrismaClient["$transaction"]>[0]>[0];

@@ -136,6 +136,8 @@ export class ReplicacheService {
           lastMutationId: nextMutationId,
         }),
       ]);
+
+      logger.info(`Mutation ${mutation.id} applied successfully`);
     });
   }
 }

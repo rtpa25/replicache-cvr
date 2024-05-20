@@ -16,26 +16,24 @@ export const clientTodoMutators: (userId: string) => TodoMutators<MutatorType.CL
       userId,
     });
 
-    await tx.set(IDB_KEY.TODO({ userId, id: args.id }), normalizeToReadonlyJSON(todo));
+    await tx.set(IDB_KEY.TODO({ id: args.id }), normalizeToReadonlyJSON(todo));
   },
   async todoDelete(tx, args) {
     const todo = await TodoManager.getTodoById({
       id: args.id,
       tx,
-      userId,
     });
 
     if (todo === undefined) {
       throw new Error(`Todo with id ${args.id} not found`);
     }
 
-    await tx.del(IDB_KEY.TODO({ userId, id: args.id }));
+    await tx.del(IDB_KEY.TODO({ id: args.id }));
   },
   async todoUpdate(tx, args) {
     const todo = await TodoManager.getTodoById({
       id: args.id,
       tx,
-      userId,
     });
 
     if (todo === undefined) {
@@ -51,6 +49,6 @@ export const clientTodoMutators: (userId: string) => TodoMutators<MutatorType.CL
       args,
       oldTodo: todo,
     });
-    await tx.set(IDB_KEY.TODO({ userId, id: args.id }), normalizeToReadonlyJSON(updatedTodo));
+    await tx.set(IDB_KEY.TODO({ id: args.id }), normalizeToReadonlyJSON(updatedTodo));
   },
 });

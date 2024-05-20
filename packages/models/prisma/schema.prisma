@@ -25,6 +25,7 @@ model ClientGroup {
   lastModified DateTime @default(now()) @updatedAt @map("last_modified")
   clients      Client[]
 
+  @@index([id, userId])
   @@map("client_groups")
 }
 
@@ -35,6 +36,7 @@ model Client {
   lastMutationId Int         @default(0) @map("last_mutation_id")
   lastModified   DateTime    @default(now()) @updatedAt @map("last_modified")
 
+  @@index([id, clientGroupId])
   @@map("clients")
 }
 

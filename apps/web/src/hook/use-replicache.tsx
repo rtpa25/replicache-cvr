@@ -14,6 +14,7 @@ import { useUser } from "~/hook/user-user";
 import { clientMutators } from "~/mutators";
 
 type State = {
+  // M is a type for all mutators in the app (client and server)
   rep: Replicache<M<MutatorType.CLIENT>> | null;
 };
 
@@ -107,9 +108,6 @@ export const useLoadReplicache = () => {
     return () => {
       void r.close();
     };
-
-    // ignoring router because of unstability
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setRep, user?.id]);
 
   React.useEffect(() => {

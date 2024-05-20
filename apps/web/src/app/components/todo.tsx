@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Button,
   Card,
@@ -50,7 +52,8 @@ export default function Todo({ todo }: TodoProps) {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
-            <p>{todo.title}</p>
+            {/* strike throught the text when completed is true for the todod */}
+            <p className={todo.completed ? "line-through" : ""}>{todo.title}</p>
           </div>
           <Checkbox
             isSelected={todo.completed}

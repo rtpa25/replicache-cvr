@@ -20,16 +20,8 @@ export class TodoManager {
     return todo;
   }
 
-  static async getTodoById({
-    id,
-    tx,
-    userId,
-  }: {
-    id: string;
-    tx: ReadTransaction;
-    userId: string;
-  }) {
-    const todo = (await tx.get(IDB_KEY.TODO({ userId, id: id }))) as TodoType | undefined;
+  static async getTodoById({ id, tx }: { id: string; tx: ReadTransaction }) {
+    const todo = (await tx.get(IDB_KEY.TODO({ id: id }))) as TodoType | undefined;
     return todo;
   }
 
@@ -41,10 +33,10 @@ export class TodoManager {
     } as TodoType;
   }
 
-  static async getallTodos({ tx, userId }: { tx: ReadTransaction; userId: string }) {
+  static async getallTodos({ tx }: { tx: ReadTransaction }) {
     const _todos = await tx
       .scan({
-        prefix: IDB_KEY.TODO({ userId }),
+        prefix: IDB_KEY.TODO({}),
       })
       .entries()
       .toArray();
