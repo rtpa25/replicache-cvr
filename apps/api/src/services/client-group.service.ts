@@ -1,4 +1,4 @@
-import { AppError, type ClientGroupUpdateArgs, type Prisma, prismaClient } from "@repo/models";
+import { AppError, type Prisma, prismaClient } from "@repo/models";
 import { type TransactionalPrismaClient } from "@repo/models";
 
 /**
@@ -7,18 +7,7 @@ import { type TransactionalPrismaClient } from "@repo/models";
 export class ClientGroupService {
   constructor(private tx: TransactionalPrismaClient = prismaClient) {}
 
-  async update({ id, cvrVersion }: ClientGroupUpdateArgs) {
-    return this.tx.clientGroup.update({
-      where: {
-        id,
-      },
-      data: {
-        cvrVersion,
-      },
-    });
-  }
-
-  async getClientGroupById({ id, userId }: { id: string; userId: string }): Promise<
+  async getById({ id, userId }: { id: string; userId: string }): Promise<
     Prisma.ClientGroupGetPayload<{
       select: {
         id: true;

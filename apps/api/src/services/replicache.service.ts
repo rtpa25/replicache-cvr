@@ -71,26 +71,34 @@ export class ReplicacheService {
         `Processing mutation ${mutation.name} for user ${userId} in client group ${clientGroupID}`,
       );
 
+      // 1. Instantiate client and cliet group services inside the transaction block
       const clientGroupService = new ClientGroupService(tx);
       const clientService = new ClientService(tx);
 
-      const baseClientGroup = await clientGroupService.getClientGroupById({
-        id: clientGroupID,
-        userId,
-      });
-      const baseClient = await clientService.getClientById({
-        id: mutation.clientID,
-        clientGroupId: clientGroupID,
-      });
+      // 2. Fetch the base client group and client
+      const [baseClientGroup, baseClient] = await Promise.all([
+        clientGroupService.getById({
+          id: clientGroupID,
+          userId,
+        }),
+        clientService.getById({
+          id: mutation.clientID,
+          clientGroupId: clientGroupID,
+        }),
+      ]);
 
+      // 3. calculate the next mutation id
       const nextMutationId = baseClient.lastMutationId + 1;
 
+      // 4. Check if the mutation id is valid
       //#region  //*=========== Mutation id checks ===========
+      // 4.1. Check if the mutation id is less --> means already processed so just return
       if (mutation.id < nextMutationId) {
         logger.debug(`Skipping mutation ${mutation.id} because it has already been applied`);
         return;
       }
 
+      // 4.2. Check if the mutation id is greater --> means future mutation so throw error
       if (mutation.id > nextMutationId) {
         logger.error(
           `Mutation ${mutation.id} is too far in the future, expected ${nextMutationId}`,
@@ -102,14 +110,17 @@ export class ReplicacheService {
       }
       //#endregion  //*======== Mutation id checks ===========
 
+      // 5. Apply the mutation if not error mode
       if (!errorMode) {
         try {
+          // 5.1. Check if the mutation is valid
           const mutationName = mutation.name as keyof typeof serverMutators;
           const mutator = serverMutators[mutationName];
           if (!mutator) {
             logger.error(`Unknown mutation ${mutation.name}`);
             throw new Error(`Unknown mutation ${mutation.name}`);
           }
+          // 5.2. Apply the mutation
           const args = mutation.args;
           await mutator({
             args,
@@ -128,6 +139,7 @@ export class ReplicacheService {
         }
       }
 
+      // 6. Update the client with the new mutation id
       await Promise.all([
         clientGroupService.upsert({ ...baseClientGroup }),
         clientService.upsert({

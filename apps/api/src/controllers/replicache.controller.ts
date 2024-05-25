@@ -83,7 +83,7 @@ class ReplicacheController {
         const todoService = new TodoService(tx);
 
         const [baseClientGroup, todosMeta, clientsMeta] = await Promise.all([
-          clientGroupService.getClientGroupById({
+          clientGroupService.getById({
             id: clientGroupID,
             userId,
           }),
