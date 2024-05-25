@@ -21,7 +21,6 @@ model ClientGroup {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String   @map("user_id")
   cvrVersion   Int      @map("cvr_version")
-  rowVersion   Int      @default(0) @map("row_version")
   lastModified DateTime @default(now()) @updatedAt @map("last_modified")
   clients      Client[]
 

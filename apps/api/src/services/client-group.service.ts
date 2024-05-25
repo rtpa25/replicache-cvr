@@ -7,13 +7,12 @@ import { type TransactionalPrismaClient } from "@repo/models";
 export class ClientGroupService {
   constructor(private tx: TransactionalPrismaClient = prismaClient) {}
 
-  async update({ id, rowVersion, cvrVersion }: ClientGroupUpdateArgs) {
+  async update({ id, cvrVersion }: ClientGroupUpdateArgs) {
     return this.tx.clientGroup.update({
       where: {
         id,
       },
       data: {
-        rowVersion,
         cvrVersion,
       },
     });
@@ -25,7 +24,6 @@ export class ClientGroupService {
         id: true;
         userId: true;
         cvrVersion: true;
-        rowVersion: true;
       };
     }>
   > {
@@ -38,7 +36,6 @@ export class ClientGroupService {
         id: true,
         userId: true,
         cvrVersion: true,
-        rowVersion: true,
       },
     });
     if (!clientGroup) {
@@ -46,7 +43,6 @@ export class ClientGroupService {
         id,
         userId,
         cvrVersion: 0,
-        rowVersion: 0,
       };
     }
     if (clientGroup.userId !== userId) {

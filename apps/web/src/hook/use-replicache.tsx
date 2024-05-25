@@ -48,6 +48,8 @@ export const useLoadReplicache = () => {
       licenseKey: env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY,
       mutators: clientMutators(user.id),
       schemaVersion: env.NEXT_PUBLIC_SCHEMA_VERSION ?? "1",
+      // pushURL: "",
+      // pullURL: "",
     });
 
     r.pusher = async (opts) => {
