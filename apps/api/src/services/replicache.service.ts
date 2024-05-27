@@ -30,6 +30,7 @@ export class ReplicacheService {
     const patch: PatchOperation[] = [];
     const { previousCVR, ...models } = args;
 
+    // clears the whole indexDB if previousCVR is undefined
     if (previousCVR === undefined) {
       patch.push({ op: "clear" });
     }
@@ -39,13 +40,13 @@ export class ReplicacheService {
 
       dels.forEach((del) =>
         patch.push({
-          op: "del",
+          op: "del", // delete from indexDB if it exists
           key: IDB_KEY[key]({ id: del }),
         }),
       );
       data.forEach((datum) =>
         patch.push({
-          op: "put",
+          op: "put", // put in indexDB if it doesn't exist or update if it does
           key: IDB_KEY[key]({ id: datum.id }),
           value: normalizeToReadonlyJSON(datum),
         }),

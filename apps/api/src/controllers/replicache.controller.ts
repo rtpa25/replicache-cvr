@@ -75,36 +75,50 @@ class ReplicacheController {
     try {
       const userId = req.user.id;
       const { cookie, clientGroupID } = req.body;
+      // 1. Get the base CVR and the previous CVR from the cache
       const { baseCVR, previousCVR } = await cvrCache.getBaseCVR(clientGroupID, cookie);
 
       const trxResponse = await transact(async (tx) => {
+        // 2. Init services inside the transaction
+        //#region  //*=========== init services ===========
         const clientGroupService = new ClientGroupService(tx);
         const clientService = new ClientService(tx);
         const todoService = new TodoService(tx);
+        //#endregion  //*======== init services ===========
 
-        const [baseClientGroup, todosMeta, clientsMeta] = await Promise.all([
-          clientGroupService.getById({
-            id: clientGroupID,
-            userId,
-          }),
+        // 3. Get the base client group
+        const baseClientGroup = await clientGroupService.getById({
+          id: clientGroupID,
+          userId,
+        });
+
+        // 4. Get the all todos and clients (just id and rowVersion) from the database
+        // this needs to be done for all entities that are part of the sync
+        const [todosMeta, clientsMeta] = await Promise.all([
           todoService.findMeta({ userId }),
           clientService.findMeta({ clientGroupId: clientGroupID }),
         ]);
 
+        // 5. Generate the next CVR
         const nextCVR = CVR.generateCVR({
           clientsMeta,
           todosMeta,
         });
 
-        const todoPuts = CVR.getPutsSince(nextCVR.todos, baseCVR.todos);
-        const todoDels = CVR.getDelsSince(nextCVR.todos, baseCVR.todos);
+        // 6. Get the puts and dels for todos
+        // this needs to be done for all entities that are part of the sync
+        const todoPuts = CVR.getPutsSince(nextCVR.todos, baseCVR.todos); // puts refers to ones that are new or updated
+        const todoDels = CVR.getDelsSince(nextCVR.todos, baseCVR.todos); // dels refers to ones that are deleted
 
+        // 7. Check if prevCVR existed inside redis now there are no puts or dels so we can return null
         if (previousCVR && todoDels.length === 0 && todoPuts.length === 0) {
           return null;
         }
 
+        // 8. Get the actual todos data from the database for all the puts
         const todos = await todoService.findMany({ ids: todoPuts });
 
+        // 9. Get the puts for clients and compute the changes for each client
         const clientPuts = CVR.getPutsSince(nextCVR.clients, baseCVR.clients);
         const clientChanges: Record<string, number> = {}; // {clientid: lastMutationId}
         for (const id of clientPuts) {
@@ -112,6 +126,7 @@ class ReplicacheController {
           clientChanges[id] = c ? c.rowVersion : 0;
         }
 
+        // 10. Upsert the client group with the new CVR version
         const previousCVRVersion = cookie?.order ?? baseClientGroup.cvrVersion;
         const nextClientGroup = await clientGroupService.upsert({
           id: baseClientGroup.id,
@@ -119,11 +134,13 @@ class ReplicacheController {
           cvrVersion: Math.max(previousCVRVersion, baseClientGroup.cvrVersion) + 1,
         });
 
+        // 11. Generate the new response cookie
         const responseCookie: PullCookie = {
           clientGroupID,
           order: nextClientGroup.cvrVersion,
         };
 
+        // 12. Generate the patch for Replicache to sync the indexDB of the client group
         const patch = ReplicacheService.genPatch({
           previousCVR,
           TODO: {
@@ -149,7 +166,9 @@ class ReplicacheController {
       }
 
       const { patch, clientChanges, nextCVR, responseCookie } = trxResponse;
+      // 13. Set the new CVR in the cache
       await cvrCache.setCVR(responseCookie.clientGroupID, responseCookie.order, nextCVR);
+      // 14. Delete the old CVR from the cache if it existed
       if (cookie) {
         await cvrCache.delCVR(clientGroupID, cookie.order);
       }
