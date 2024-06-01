@@ -29,11 +29,12 @@ export async function transact<T>(body: (tx: TransactionalPrismaClient) => Promi
       });
       return r;
     } catch (error) {
-      logger.error(`Transaction failed, retrying...${error}`);
       if (shouldRetryTxn(error)) {
         logger.debug(`Retrying transaction...`);
         continue;
       }
+      logger.error(`Transaction failed, retrying...${error}`);
+      throw error;
     }
   }
   throw new AppError({

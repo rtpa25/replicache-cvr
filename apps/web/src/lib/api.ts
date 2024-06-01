@@ -3,6 +3,7 @@ import axios from "axios";
 
 import {
   type PullRequest,
+  type PullResponseOKV1,
   type PushRequest,
   type UserCreateOutputType,
   type UserGetOutputType,
@@ -39,12 +40,18 @@ export class API {
   };
 
   replicachePull = async (data: PullRequest, instanceId: string) => {
-    const response = await _axios.post(`/replicache/pull?instance=${instanceId}`, data);
+    const response = await _axios.post<PullResponseOKV1>(
+      `/replicache/pull?instance=${instanceId}`,
+      data,
+    );
     return response;
   };
 
   replicachePush = async (data: PushRequest, instanceId: string) => {
-    const response = await _axios.post(`/replicache/push?instance=${instanceId}`, data);
+    const response = await _axios.post<{
+      success: boolean;
+      errors: { mutationName: string; errorMessage: string; errorCode: string }[];
+    }>(`/replicache/push?instance=${instanceId}`, data);
     return response;
   };
 }

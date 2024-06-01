@@ -2,6 +2,7 @@ import { useAbly } from "ably/react";
 import { AxiosError } from "axios";
 import { nanoid } from "nanoid";
 import * as React from "react";
+import toast from "react-hot-toast";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
@@ -48,13 +49,19 @@ export const useLoadReplicache = () => {
       licenseKey: env.NEXT_PUBLIC_REPLICACHE_LICENSE_KEY,
       mutators: clientMutators(user.id),
       schemaVersion: env.NEXT_PUBLIC_SCHEMA_VERSION ?? "1",
-      // pushURL: "",
-      // pullURL: "",
     });
 
     r.pusher = async (opts) => {
       try {
         const response = await api.replicachePush(opts, iid);
+
+        if (!response.data.success) {
+          response.data.errors.forEach((error) => {
+            console.error(`Error processing mutation ${error.mutationName}: ${error.errorMessage}`);
+            toast.error(`Error processing mutation ${error.mutationName}: ${error.errorMessage}`);
+          });
+        }
+
         return {
           httpRequestInfo: {
             httpStatusCode: response.status,

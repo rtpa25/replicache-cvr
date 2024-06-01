@@ -91,29 +91,28 @@ export class ReplicacheService {
       // 3. calculate the next mutation id
       const nextMutationId = baseClient.lastMutationId + 1;
 
-      // 4. Check if the mutation id is valid
-      //#region  //*=========== Mutation id checks ===========
-      // 4.1. Check if the mutation id is less --> means already processed so just return
-      if (mutation.id < nextMutationId) {
-        logger.debug(`Skipping mutation ${mutation.id} because it has already been applied`);
-        return;
-      }
-
-      // 4.2. Check if the mutation id is greater --> means future mutation so throw error
-      if (mutation.id > nextMutationId) {
-        logger.error(
-          `Mutation ${mutation.id} is too far in the future, expected ${nextMutationId}`,
-        );
-        throw new AppError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `Mutation ${mutation.id} is too far in the future, expected ${nextMutationId}`,
-        });
-      }
-      //#endregion  //*======== Mutation id checks ===========
-
       // 5. Apply the mutation if not error mode
       if (!errorMode) {
         try {
+          // 4. Check if the mutation id is valid
+          //#region  //*=========== Mutation id checks ===========
+          // 4.1. Check if the mutation id is less --> means already processed so just return
+          if (mutation.id < nextMutationId) {
+            logger.debug(`Skipping mutation ${mutation.id} because it has already been applied`);
+            return;
+          }
+
+          // 4.2. Check if the mutation id is greater --> means future mutation so throw error
+          if (mutation.id > nextMutationId) {
+            logger.error(
+              `Mutation ${mutation.id} is too far in the future, expected ${nextMutationId}`,
+            );
+            throw new AppError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: `Mutation ${mutation.id} is too far in the future, expected ${nextMutationId}`,
+            });
+          }
+          //#endregion  //*======== Mutation id checks ===========
           // 5.1. Check if the mutation is valid
           const mutationName = mutation.name as keyof typeof serverMutators;
           const mutator = serverMutators[mutationName];

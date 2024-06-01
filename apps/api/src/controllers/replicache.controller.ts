@@ -28,6 +28,11 @@ class ReplicacheController {
     next: NextFunction,
   ) => {
     const userId = req.user.id;
+    const errors: {
+      mutationName: string;
+      errorMessage: string;
+      errorCode: string;
+    }[] = [];
     try {
       const push = req.body;
       for (const mutation of push.mutations) {
@@ -45,10 +50,18 @@ class ReplicacheController {
             mutation,
             userId,
           });
+          if (error instanceof AppError) {
+            errors.push({
+              mutationName: mutation.name,
+              errorMessage: error.message,
+              errorCode: error.code,
+            });
+          }
         }
       }
       return res.status(200).json({
-        success: true,
+        success: errors.length === 0,
+        errors,
       });
     } catch (error) {
       if (error instanceof AppError) {
@@ -109,11 +122,6 @@ class ReplicacheController {
         // this needs to be done for all entities that are part of the sync
         const todoPuts = CVR.getPutsSince(nextCVR.todos, baseCVR.todos); // puts refers to ones that are new or updated
         const todoDels = CVR.getDelsSince(nextCVR.todos, baseCVR.todos); // dels refers to ones that are deleted
-
-        // 7. Check if prevCVR existed inside redis now there are no puts or dels so we can return null
-        if (previousCVR && todoDels.length === 0 && todoPuts.length === 0) {
-          return null;
-        }
 
         // 8. Get the actual todos data from the database for all the puts
         const todos = await todoService.findMany({ ids: todoPuts });
