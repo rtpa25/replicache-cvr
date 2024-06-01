@@ -2,6 +2,52 @@
 
 This is a guide for setting up replicache with the row versioning backend strategy, in a production ready setup. This mono-repo is bootstraped using Turbo and consists of the following components:
 
+## Setup
+
+Clone the repo
+
+```bash
+git clone https://github.com/rtpa25/replicache-cvr.git
+```
+
+Install dependencies
+
+```bash
+pnpm install
+```
+
+Copy the `.env.example` file to `.env` and fill in the required values
+
+```bash
+cp .env.example .env
+```
+
+Make sure to populate it with your api keys
+
+You will need docker setup for running postgres and redis, you can start the services using
+
+```bash
+docker-compose up -d
+```
+
+Run the migrations
+
+```bash
+pnpm db:migrate:dev
+```
+
+Generate the prisma client
+
+```bash
+pnpm db:generate
+```
+
+Start the server -- this will start the api server and the web server using turbo
+
+```bash
+pnpm dev
+```
+
 ## Apps
 
 - **Web**:
@@ -21,5 +67,16 @@ This is a guide for setting up replicache with the row versioning backend strate
   - In this case it houses JWT, Custom Logger, Redis and Ably(thirdy party socket server) setup
 
 - **Models**:
-  - A custom replicache client that extends the default replicache client
-  - This client is used to setup the replicache client with the row versioning strategy
+
+  - prisma schema and migrations, also exports the whole prisma client, so any types that are needed are imported from the models package
+  - zod schemas that are shared across apps
+  - all the type-system that we have around
+  - I also export replicache from this package, so as not to manage multiple versions of this lib over my client and server
+  - various other types and utility classes
+
+- **eslint-config**:
+
+  - contains es-lint config for different types of projects inside the monorepo
+
+- **typescript-config**:
+  - consists of ts-config files for different environments
