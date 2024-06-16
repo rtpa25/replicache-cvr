@@ -1,6 +1,7 @@
 # Replicache-Row-Versioning-Setup
 
-This is a guide for setting up replicache with the row versioning backend strategy, in a production ready setup. This mono-repo is bootstraped using Turbo and consists of the following components:
+- This is a guide for setting up replicache with the row versioning backend strategy, in a production ready setup. 
+- [In depth blog series walking through this project](https://ronit.dev/series/realtimesync)
 
 ## Setup
 
